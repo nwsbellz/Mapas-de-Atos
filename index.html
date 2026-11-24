@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atos Guia — mapa</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eef0fb;background:#0b1226}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#1a1f4a,#0b1226 60%);min-height:100vh}
+main{max-width:760px;margin:auto;padding:24px 16px 40px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.logo{width:52px;height:52px;border-radius:16px;background:#f2c14e;color:#2a1f05;display:grid;place-items:center;font-size:27px;font-weight:800}
+h1{margin:0;font-size:25px}header p{margin:3px 0 0;color:#aab3d6;font-size:14px}
+.card{background:#161d3d;border:1px solid #2e3a6b;border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 12px 30px #0002}
+.label{color:#b9c1e3;font-size:13px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.big{font-size:38px;font-weight:800;letter-spacing:-1px;margin:7px 0}
+.muted{color:#aab3d6;font-size:14px}
+.track{height:11px;border-radius:99px;background:#2a3463;overflow:hidden;margin:15px 0 8px}
+.fill{height:100%;width:0;background:#f2c14e;border-radius:99px;transition:width .2s}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+button{font:inherit;border-radius:12px;border:0;padding:12px 15px;background:#f2c14e;color:#2a1f05;font-weight:750;cursor:pointer}
+button.secondary{background:#26305e;color:#eef0fb;border:1px solid #44528f}
+button:active{transform:scale(.98)}
+.quick{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.quick button{padding:9px 12px;font-size:14px}
+.quick button.on{background:var(--c);color:#1a1405;border-color:var(--c)}
+.mapwrap{margin-top:14px;border-radius:16px;overflow:hidden;border:1px solid #2e3a6b}
+svg{display:block}
+.city{cursor:pointer}
+#info{margin-top:12px;background:#0f1530;border:1px solid #2e3a6b;border-radius:14px;padding:13px 14px;min-height:92px}
+#it{font-weight:750;font-size:17px}#tx{color:#d3d8f0;font-size:14px;margin-top:6px}.ps{display:grid;gap:9px}.p{display:flex;gap:10px;align-items:flex-start}.ref{flex:none;background:#f2c14e;color:#2a1f05;font-weight:750;font-size:12px;padding:3px 9px;border-radius:99px;white-space:nowrap;margin-top:1px}.pt{color:#d3d8f0;font-size:14px}#st{color:#8c96c4;font-size:12px;margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:14px}
+.ch{padding:10px 0;border-radius:12px;background:#0f1530;border:1px solid #2e3a6b;color:#eef0fb;font-weight:700;text-align:center}
+.ch.on{background:#f2c14e;color:#2a1f05;border-color:#f2c14e}
+.ch.today{outline:2px solid #6cb4ff;outline-offset:1px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+.stat{background:#0f1530;border-radius:15px;padding:15px}.stat b{font-size:22px;display:block;margin-top:5px}
+footer{text-align:center;color:#8c96c4;font-size:12px;margin-top:22px}
+@media(min-width:600px){main{padding-top:34px}.card{padding:24px}}
+
+.tabs{display:flex;gap:8px;margin-bottom:6px}
+.tabs button{flex:1;background:#26305e;color:#eef0fb;border:1px solid #44528f}
+.tabs button.on{background:#f2c14e;color:#2a1f05;border-color:#f2c14e}
+[hidden]{display:none!important}
+#mmscroll{overflow-x:auto;border-radius:16px;border:1px solid #2e3a6b;margin-top:14px;-webkit-overflow-scrolling:touch}
+#mm{display:block;min-width:620px;width:100%;height:auto}
+.leaf{transition:transform .55s cubic-bezier(.34,1.56,.64,1),opacity .3s;cursor:pointer}
+.mmline{transition:opacity .35s;animation:dash 1.2s linear infinite}
+.branch{cursor:pointer}
+.branch rect,.leaf rect{transition:fill .25s}
+.ck{opacity:0;transition:opacity .3s}
+.bob{animation:bob 3.4s ease-in-out infinite}
+.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 2.4s ease-out infinite}
+.spark{animation:burst .9s ease-out forwards}
+@keyframes dash{to{stroke-dashoffset:-22}}
+@keyframes bob{50%{transform:translateY(-3px)}}
+@keyframes pulse{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.6);opacity:0}}
+@keyframes burst{to{transform:translate(var(--dx),var(--dy));opacity:0}}
+@media(prefers-reduced-motion:reduce){.mmline,.bob,.pulse{animation:none}.leaf{transition:none}}
+#mmInfo{margin-top:12px;background:#0f1530;border:1px solid #2e3a6b;border-radius:14px;padding:13px 14px}
+.chip{display:inline-block;background:#f2c14e;color:#2a1f05;font-weight:750;font-size:12px;padding:3px 9px;border-radius:99px;margin-left:8px;vertical-align:middle}
+#mmInfo .tt{font-weight:750;font-size:17px}
+#mmInfo .bd{color:#d3d8f0;font-size:14px;margin-top:6px}
+#mmInfo button{margin-top:10px;padding:9px 12px;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<header><div class="logo">A</div><div><h1>Atos Guia</h1><p>Explore Atos no mapa e no mapa mental.</p></div></header>
+
+<nav class="tabs"><button id="tabMap" class="on" onclick="showTab('map')">Mapa geográfico</button><button id="tabMental" onclick="showTab('mental')">Mapa mental</button></nav>
+<div id="v-map">
+<section class="card">
+<div class="label">Mapa interativo</div>
+<div class="quick" id="bt"></div>
+<div class="mapwrap">
+<svg id="map" width="100%" viewBox="0 0 380 440" role="img" aria-label="Mapa do Mediterrâneo com as rotas de Paulo">
+<rect width="380" height="440" fill="#0a1330"/>
+<g fill="#27346e" stroke="#4a5a9a" stroke-width="0.8" stroke-linejoin="round">
+<polygon points="128,0 380,0 380,203 335,203 316,207 308,207 284,217 266,204 248,200 226,190 224,170 212,139 208,105 208,77 206,54 195,56 185,66 176,78 180,110 182,150 188,156 176,173 170,207 159,190 153,139 135,88"/>
+<polygon points="20,0 68,0 92,26 122,81 104,95 98,130 92,156 86,130 87,88 68,61 50,24 34,0"/>
+<polygon points="335,203 380,203 380,384 311,384 314,367 322,326 330,275 332,231"/>
+<polygon points="0,170 20,190 26,222 32,258 20,292 44,332 80,347 100,372 116,400 140,370 152,330 176,343 200,372 224,390 259,387 272,380 300,383 311,384 380,384 380,440 0,440"/>
+<ellipse cx="68" cy="170" rx="18" ry="10"/><ellipse cx="198" cy="250" rx="20" ry="4"/><ellipse cx="306" cy="250" rx="12" ry="6"/>
+</g>
+<polygon points="240,0 380,0 380,48 330,38 280,40 250,46" fill="#0a1330" stroke="#4a5a9a" stroke-width="0.8"/>
+<text x="150" y="288" font-size="12" font-style="italic" fill="#5a6fa8" text-anchor="middle">Mar Mediterrâneo</text>
+<g id="routes" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+<circle id="ring" r="10" fill="none" stroke="#fff" stroke-width="1.5" opacity="0"/>
+<g id="cities"></g>
+<circle id="trav" r="5" fill="#1a1405" stroke="#fff" stroke-width="2.5" opacity="0"/>
+</svg>
+</div>
+<div id="info"><div id="it">Escolha uma viagem</div><div id="tx">Toque em um botão para ver Paulo percorrer a rota, ou toque numa cidade.</div><div id="st"></div></div>
+</section>
+</div>
+<div id="v-mental" hidden>
+<section class="card">
+<div class="row"><div><div class="label">Mapa mental de Atos</div><div class="muted" style="margin-top:4px">Toque nos ramos para abrir e descubra cada passagem.</div></div><div style="text-align:right"><div class="label">Descobertos</div><div style="font-size:22px;font-weight:800;margin-top:4px"><span id="mmCount">0</span>/18</div></div></div>
+<div class="track"><div class="fill" id="mmBar"></div></div>
+<div class="quick"><button id="mmAll">Abrir tudo</button><button class="secondary" id="mmNone">Fechar tudo</button><button class="secondary" id="mmRand">Surpreenda-me</button></div>
+<div id="mmscroll"><svg id="mm" viewBox="0 0 620 700" role="img" aria-label="Mapa mental interativo do livro de Atos">
+<rect width="620" height="700" fill="#0a1330"/>
+<g id="mmStars" fill="#2e3a6b"></g>
+<g id="mmLines" fill="none"></g>
+<g id="mmLeaves"></g>
+<g id="mmBranches"></g>
+<g id="mmHub"></g>
+<g id="mmSparks"></g>
+</svg></div>
+<div id="mmInfo"><div class="tt">Comece por qualquer ramo</div><div class="bd">Toque em Atos no centro para abrir tudo, ou use Surpreenda-me para sortear uma passagem. Se o mapa estiver cortado, arraste para os lados.</div></div>
+</section>
+</div>
+<footer>Atos Guia • Mapa esquemático: posições aproximadas.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const C={
+jer:[322,367,'Jerusalém',[["At 1:4-5", "Jesus manda os discípulos esperarem em Jerusalém a promessa do Espírito."], ["At 2:1-4", "No Pentecostes, o Espírito vem sobre eles e começam a falar em outras línguas."], ["At 2:41", "Cerca de três mil pessoas são batizadas naquele dia."], ["At 7:54-60", "Estêvão é apedrejado e se torna o primeiro mártir."]],-9,4,'end',1],
+dam:[336,309,'Damasco',[["At 9:3-6", "Uma luz do céu cerca Saulo e Jesus pergunta por que ele o persegue."], ["At 9:17-18", "Ananias ora por Saulo, que recupera a vista e é batizado."], ["At 9:20", "Logo começa a pregar nas sinagogas que Jesus é o Filho de Deus."]],-9,4,'end'],
+ces:[319,343,'Cesareia',[["At 10:44-48", "O Espírito desce sobre Cornélio e sua casa, e todos são batizados."], ["At 24:24-25", "Paulo fala a Félix sobre justiça, domínio próprio e juízo."], ["At 25:11-12", "Paulo apela para César."]],-9,4,'end'],
+ant:[335,218,'Antioquia',[["At 11:19-21", "Os dispersos pela perseguição pregam em Antioquia e muitos creem."], ["At 11:26", "Os discípulos são chamados cristãos pela primeira vez."], ["At 13:1-3", "A igreja ora e jejua, e o Espírito separa Barnabé e Saulo para a obra."]],-9,-5,'end',1],
+tar:[319,193,'Tarso',[["At 9:30", "Os irmãos levam Saulo até Tarso, em segurança."], ["At 11:25-26", "Barnabé vai a Tarso buscar Saulo e o leva para Antioquia."], ["At 21:39", "Paulo se apresenta como cidadão de Tarso."]],-9,4,'end'],
+chi:[308,251,'Chipre',[["At 13:4-5", "Barnabé e Saulo chegam a Salamina e pregam nas sinagogas."], ["At 13:6-11", "Em Pafos, o mágico Elimas se opõe e fica cego por um tempo."], ["At 13:12", "O procônsul Sérgio Paulo crê, admirado com o ensino."]],-9,16,'end'],
+pis:[275,145,'Pisídia',[["At 13:14-16", "Em Antioquia da Pisídia, Paulo recebe a palavra na sinagoga."], ["At 13:38-39", "Anuncia o perdão dos pecados e a justificação por Jesus."], ["At 13:46-48", "Diante da oposição, voltam-se aos gentios, que se alegram."]],0,-11,'middle'],
+ico:[290,159,'Icônio',[["At 14:1", "Pregam na sinagoga e grande número de judeus e gregos crê."], ["At 14:2-5", "Surge oposição e há plano de apedrejá-los; eles fogem."]],-8,17,'end'],
+tro:[211,94,'Trôade',[["At 16:8-10", "Em visão, Paulo vê um macedônio pedindo ajuda; decidem ir à Macedônia."], ["At 20:7-12", "Paulo prega até tarde; Êutico cai da janela e é restaurado."]],9,4,'start'],
+fil:[191,54,'Filipos',[["At 16:13-15", "Lídia ouve Paulo, crê e é batizada com sua casa."], ["At 16:25-26", "Paulo e Silas oram na prisão e um terremoto abre as portas."], ["At 16:30-34", "O carcereiro e toda a sua família creem e são batizados."]],9,4,'start'],
+cor:[180,158,'Atenas e Corinto',[["At 17:22-23", "Em Atenas, Paulo fala no Areópago sobre o altar ao deus desconhecido."], ["At 17:32-34", "Alguns zombam; outros creem, entre eles Dionísio."], ["At 18:1-4", "Em Corinto, Paulo conhece Áquila e Priscila e trabalha com eles."], ["At 18:11", "Fica ali um ano e seis meses ensinando a palavra."]],0,21,'middle'],
+efe:[224,159,'Éfeso',[["At 19:1-6", "Paulo encontra discípulos que recebem o Espírito Santo."], ["At 19:9-10", "Ensina na escola de Tirano por dois anos."], ["At 19:23-29", "Um tumulto dos ourives toma a cidade por causa de Diana."]],9,-8,'start'],
+mal:[72,227,'Malta',[["At 27:41-44", "O navio encalha, mas todos chegam salvos à terra."], ["At 28:1-2", "Os habitantes da ilha os recebem com bondade."], ["At 28:3-6", "Uma víbora morde Paulo, mas ele não sofre dano."], ["At 28:8-9", "Paulo cura o pai de Públio e outros doentes."]],10,4,'start'],
+rom:[50,23,'Roma',[["At 28:14-16", "Paulo chega a Roma, irmãos vêm ao seu encontro e ele mora com um soldado."], ["At 28:23-24", "Explica o reino de Deus do amanhecer ao entardecer."], ["At 28:30-31", "Por dois anos prega o reino, sem impedimento."]],12,4,'start',1]
+};
+const J=[
+{n:'Conversão',c:'#6cb4ff',r:['jer','dam','tar']},
+{n:'1ª viagem',c:'#5ee0b0',r:['ant','chi','pis','ico','ant']},
+{n:'2ª viagem',c:'#ff8a65',r:['ant','tar','ico','tro','fil','cor','efe','ces','ant']},
+{n:'3ª viagem',c:'#ff7eb6',r:['ant','efe','fil','cor','fil','tro','ces','jer']},
+{n:'Rumo a Roma',c:'#f2c14e',r:['ces','mal','rom']}
+];
+const NS='http://www.w3.org/2000/svg';
+const paths=[],cums=[];let cur=-1,raf=0;
+J.forEach((j,i)=>{
+const p=document.createElementNS(NS,'path');
+p.setAttribute('d','M'+j.r.map(k=>C[k][0]+' '+C[k][1]).join(' L'));
+p.setAttribute('stroke',j.c);p.setAttribute('stroke-width','2');p.setAttribute('opacity','0.25');
+$('routes').appendChild(p);paths.push(p);
+let c=[0],t=0;for(let k=1;k<j.r.length;k++){const a=C[j.r[k-1]],b=C[j.r[k]];t+=Math.hypot(a[0]-b[0],a[1]-b[1]);c.push(t)}
+cums.push(c);
+const b=document.createElement('button');b.className='secondary';b.style.setProperty('--c',j.c);b.textContent=j.n;b.onclick=()=>sel(i);
+$('bt').appendChild(b);j.b=b;
+});
+Object.keys(C).forEach(k=>{
+const d=C[k],g=document.createElementNS(NS,'g');g.setAttribute('class','city');
+g.innerHTML='<circle cx="'+d[0]+'" cy="'+d[1]+'" r="13" fill="transparent"/><circle cx="'+d[0]+'" cy="'+d[1]+'" r="'+(d[7]?5.5:4)+'" fill="#0b1226" stroke="#eef0fb" stroke-width="1.5"/><text x="'+(d[0]+d[4])+'" y="'+(d[1]+d[5])+'" text-anchor="'+d[6]+'" font-size="11" '+(d[7]?'font-weight="700" ':'')+'fill="#eef0fb" stroke="#0b1226" stroke-width="3" paint-order="stroke">'+d[2]+'</text>';
+g.onclick=()=>{stop(true);show(k,'')};
+$('cities').appendChild(g);
+});
+function show(k,s){
+const d=C[k];$('it').textContent=d[2];$('st').textContent=s;
+const t=$('tx');t.className='ps';t.textContent='';
+d[3].forEach(p=>{const r=document.createElement('div');r.className='p';const a=document.createElement('span');a.className='ref';a.textContent=p[0];const b=document.createElement('span');b.className='pt';b.textContent=p[1];r.appendChild(a);r.appendChild(b);t.appendChild(r)});
+const r=$('ring');r.setAttribute('cx',d[0]);r.setAttribute('cy',d[1]);r.setAttribute('opacity','1');
+}
+function stop(finish){
+cancelAnimationFrame(raf);
+if(finish&&cur>=0){paths[cur].style.strokeDashoffset=0;$('trav').setAttribute('opacity','0')}
+}
+function sel(i){
+stop(false);cur=i;
+J.forEach((j,x)=>{j.b.className=x===i?'on':'secondary';paths[x].setAttribute('opacity',x===i?'1':'0.25');paths[x].setAttribute('stroke-width',x===i?'3':'2');paths[x].style.strokeDasharray='none';paths[x].style.strokeDashoffset=0});
+const p=paths[i],len=p.getTotalLength(),cum=cums[i],j=J[i];
+p.style.strokeDasharray=len;p.style.strokeDashoffset=len;
+const tv=$('trav');tv.setAttribute('stroke',j.c);tv.setAttribute('opacity','1');
+const dur=(j.r.length-1)*1100,t0=performance.now();let last=-1;
+function f(now){
+const t=Math.min(1,(now-t0)/dur),d=len*t;
+p.style.strokeDashoffset=len-d;
+const pt=p.getPointAtLength(d);tv.setAttribute('cx',pt.x);tv.setAttribute('cy',pt.y);
+let k=0;for(let x=0;x<cum.length;x++){if(cum[x]<=d+0.5)k=x}
+if(k!==last){last=k;show(j.r[k],j.n+' · parada '+(k+1)+' de '+j.r.length)}
+if(t<1)raf=requestAnimationFrame(f);else tv.setAttribute('opacity','0');
+}
+raf=requestAnimationFrame(f);
+}
+
+
+const MM=[
+{n:'Jerusalém',s:'At 1–7',c:'#ff8a65',p:[310,225],L:[
+{n:'Pentecostes',r:'At 2:1-41',t:'O Espírito vem sobre os discípulos na festa de Pentecostes. Pedro prega e cerca de três mil pessoas são batizadas naquele dia.',x:'Gente de várias nações ouve o evangelho na própria língua (At 2:5-11).',go:{c:'jer'},p:[170,85]},
+{n:'Igreja unida',r:'At 2:42-47',t:'Os crentes se dedicam ao ensino dos apóstolos, à comunhão, ao partir do pão e às orações, e repartem seus bens conforme a necessidade.',go:{c:'jer'},p:[310,62]},
+{n:'Estêvão',r:'At 6–7',t:'Escolhido para servir, Estêvão é levado ao conselho, faz um longo discurso e é apedrejado. Saulo aprova a sua morte.',x:'É o primeiro mártir cristão registrado em Atos.',go:{c:'jer'},p:[450,85]}]},
+{n:'Judeia e Samaria',s:'At 8–12',c:'#6cb4ff',p:[410,290],L:[
+{n:'Filipe e o etíope',r:'At 8:26-40',t:'Um anjo envia Filipe a um caminho no deserto. Ali ele explica Isaías a um oficial etíope, que crê e é batizado.',p:[525,150]},
+{n:'Saulo convertido',r:'At 9:1-19',t:'No caminho de Damasco, Jesus aparece a Saulo. Cego, ele é ajudado por Ananias, recupera a vista e é batizado.',go:{c:'dam'},p:[525,195]},
+{n:'Cornélio',r:'At 10',t:'Pedro tem uma visão e vai à casa do centurião Cornélio, em Cesareia. O Espírito desce sobre os gentios que ouvem a mensagem.',x:'Marca a abertura do evangelho aos não judeus.',go:{c:'ces'},p:[525,240]}]},
+{n:'Viagens de Paulo',s:'At 13–21',c:'#5ee0b0',p:[410,430],L:[
+{n:'1ª viagem',r:'At 13–14',t:'Barnabé e Paulo são enviados de Antioquia, passam por Chipre e pelo interior da Ásia Menor, pregam também aos gentios e voltam fortalecendo as igrejas.',go:{j:1},p:[525,475]},
+{n:'2ª viagem',r:'At 15:36–18:22',t:'Paulo parte com Silas, recebe a visão do macedônio em Trôade e vê igrejas nascerem em Filipos, Tessalônica e Corinto.',go:{j:2},p:[525,520]},
+{n:'3ª viagem',r:'At 18:23–21:17',t:'Paulo fortalece os discípulos, permanece cerca de três anos em Éfeso e depois segue em direção a Jerusalém.',go:{j:3},p:[525,565]}]},
+{n:'Rumo a Roma',s:'At 21–28',c:'#f2c14e',p:[310,495],L:[
+{n:'Julgamentos',r:'At 24–26',t:'Preso, Paulo se defende diante de Félix, Festo e Agripa e apela a César.',go:{c:'ces'},p:[170,640]},
+{n:'Naufrágio',r:'At 27',t:'Uma tempestade de quatorze dias no mar. Paulo anima os 276 a bordo e todos chegam salvos.',go:{c:'mal'},p:[310,665]},
+{n:'Em Roma',r:'At 28',t:'Paulo chega a Roma, vive em casa alugada sob guarda e prega o reino de Deus por dois anos, sem impedimento.',go:{c:'rom'},p:[450,640]}]},
+{n:'Personagens',s:'Quem age',c:'#ff7eb6',p:[210,430],L:[
+{n:'Pedro',r:'At 2; 3; 10',t:'Líder entre os apóstolos nos primeiros capítulos: prega em Pentecostes, cura um coxo e abre a porta aos gentios em Cesareia.',p:[95,475]},
+{n:'Paulo',r:'At 9; 13–28',t:'De perseguidor (Saulo) a grande missionário dos gentios. Mais da metade do livro gira em torno dele.',p:[95,520]},
+{n:'Barnabé',r:'At 9:27; 11:25-26',t:'O encorajador: apresenta Saulo aos apóstolos, vai buscá-lo em Tarso e parte com ele na 1ª viagem.',go:{c:'ant'},p:[95,565]}]},
+{n:'Espírito Santo',s:'O fio condutor',c:'#b9a7ff',p:[210,290],L:[
+{n:'A promessa',r:'At 1:8',t:'Jesus promete poder aos discípulos para serem suas testemunhas em Jerusalém, na Judeia, em Samaria e até os confins da terra.',x:'Esse versículo funciona como o roteiro do livro inteiro.',p:[95,150]},
+{n:'Outras línguas',r:'At 2:4',t:'Os discípulos ficam cheios do Espírito e começam a falar em outras línguas.',go:{c:'jer'},p:[95,195]},
+{n:'O guia',r:'At 16:6-7',t:'O Espírito impede Paulo de pregar na Ásia e na Bitínia e o conduz rumo à Macedônia.',go:{c:'tro'},p:[95,240]}]}
+];
+const HUB=[310,360];
+const el=(tag,a,par)=>{const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(par)par.appendChild(e);return e};
+let disc=new Set(),selL=null,total=0;
+try{JSON.parse(ls.get('atos_disc')||'[]').forEach(x=>disc.add(x))}catch(e){}
+for(let i=0;i<40;i++){el('circle',{cx:(i*137)%620,cy:(i*251)%700,r:(i%3)?1:1.6},$('mmStars'))}
+MM.forEach((b,bi)=>{
+el('line',{x1:HUB[0],y1:HUB[1],x2:b.p[0],y2:b.p[1],stroke:b.c,'stroke-width':3,opacity:.55},$('mmLines'));
+b.L.forEach((l,li)=>{
+total++;l.id=bi+'-'+li;
+l.line=el('line',{x1:b.p[0],y1:b.p[1],x2:l.p[0],y2:l.p[1],stroke:b.c,'stroke-width':2,'stroke-dasharray':'5 6',class:'mmline'},$('mmLines'));
+const g=el('g',{class:'leaf'},$('mmLeaves'));g.style.transitionDelay=(li*70)+'ms';
+const w=Math.max(104,l.n.length*8.4+30);
+const inn=el('g',{class:'bob'},g);inn.style.animationDelay=(-(bi*3+li)*.6)+'s';
+l.rc=el('rect',{x:-w/2,y:-17,width:w,height:34,rx:17,fill:'#0f1530',stroke:b.c,'stroke-width':2},inn);
+el('text',{x:0,y:5,'text-anchor':'middle','font-size':14,'font-weight':600,fill:'#eef0fb'},inn).textContent=l.n;
+l.ck=el('g',{class:'ck',transform:'translate('+(w/2-6)+',-15)'},inn);
+el('circle',{r:9,fill:b.c},l.ck);el('text',{x:0,y:4,'text-anchor':'middle','font-size':12,'font-weight':800,fill:'#0b1226'},l.ck).textContent='✓';
+g.addEventListener('click',e=>{e.stopPropagation();openLeaf(bi,li)});
+l.g=g;
+});
+const bg=el('g',{class:'branch',transform:'translate('+b.p[0]+','+b.p[1]+')'},$('mmBranches'));
+b.rc=el('rect',{x:-75,y:-22,width:150,height:44,rx:14,fill:'#161d3d',stroke:b.c,'stroke-width':2.5},bg);
+b.t1=el('text',{x:-12,y:-3,'text-anchor':'middle','font-size':13,'font-weight':700,fill:'#eef0fb'},bg);b.t1.textContent=b.n;
+b.t2=el('text',{x:-12,y:14,'text-anchor':'middle','font-size':12,fill:'#aab3d6'},bg);b.t2.textContent=b.s;
+b.kc=el('circle',{cx:57,cy:0,r:10,fill:b.c},bg);
+b.kt=el('text',{x:57,y:5,'text-anchor':'middle','font-size':15,'font-weight':800,fill:'#0b1226'},bg);b.kt.textContent='+';
+bg.addEventListener('click',()=>toggleB(bi));
+b.open=false;paintB(b);
+});
+const hub=el('g',{transform:'translate('+HUB+')',style:'cursor:pointer'},$('mmHub'));
+el('circle',{r:50,fill:'none',stroke:'#f2c14e','stroke-width':3,class:'pulse'},hub);
+el('circle',{r:50,fill:'#f2c14e'},hub);
+el('text',{x:0,y:2,'text-anchor':'middle','font-size':26,'font-weight':800,fill:'#2a1f05'},hub).textContent='Atos';
+el('text',{x:0,y:22,'text-anchor':'middle','font-size':12,'font-weight':700,fill:'#2a1f05'},hub).textContent='At 1:8';
+hub.addEventListener('click',()=>{const all=MM.every(b=>b.open);MM.forEach((b,i)=>setB(i,!all))});
+function paintB(b){
+b.rc.setAttribute('fill',b.open?b.c:'#161d3d');
+b.t1.setAttribute('fill',b.open?'#0b1226':'#eef0fb');
+b.t2.setAttribute('fill',b.open?'#0b1226':'#aab3d6');
+b.kc.setAttribute('fill',b.open?'#0b1226':b.c);
+b.kt.setAttribute('fill',b.open?b.c:'#0b1226');
+b.kt.textContent=b.open?'−':'+';
+b.L.forEach(l=>{
+const o=b.open;
+l.g.style.transform=o?'translate('+l.p[0]+'px,'+l.p[1]+'px) scale(1)':'translate('+b.p[0]+'px,'+b.p[1]+'px) scale(.2)';
+l.g.style.opacity=o?1:0;l.g.style.pointerEvents=o?'auto':'none';
+l.line.style.opacity=o?.75:0;
+l.ck.style.opacity=disc.has(l.id)?1:0;
+l.rc.setAttribute('fill',disc.has(l.id)?'#1d2552':'#0f1530');
+l.rc.setAttribute('stroke-width',selL===l?4:2);
+});
+}
+function setB(i,o){MM[i].open=o;paintB(MM[i])}
+function toggleB(i){setB(i,!MM[i].open)}
+function counter(){$('mmCount').textContent=disc.size;$('mmBar').style.width=(disc.size/total*100)+'%'}
+function spark(){
+const cols=['#f2c14e','#ff8a65','#6cb4ff','#5ee0b0','#ff7eb6','#b9a7ff'];
+for(let i=0;i<24;i++){
+const a=i/24*Math.PI*2,r=140+Math.random()*120;
+const c=el('circle',{cx:HUB[0],cy:HUB[1],r:5,fill:cols[i%6],class:'spark'},$('mmSparks'));
+c.style.setProperty('--dx',Math.cos(a)*r+'px');c.style.setProperty('--dy',Math.sin(a)*r+'px');
+setTimeout(()=>c.remove(),1000);
+}
+}
+function openLeaf(bi,li){
+const b=MM[bi],l=b.L[li];
+if(!b.open)setB(bi,true);
+selL=l;
+const was=disc.size;disc.add(l.id);
+try{ls.set('atos_disc',JSON.stringify([...disc]))}catch(e){}
+MM.forEach(paintB);counter();
+const box=$('mmInfo');box.textContent='';
+const t=document.createElement('div');t.className='tt';t.textContent=l.n;
+const chip=document.createElement('span');chip.className='chip';chip.textContent=l.r;t.appendChild(chip);
+box.appendChild(t);
+const d=document.createElement('div');d.className='bd';d.textContent=l.t;box.appendChild(d);
+if(l.x){const x=document.createElement('div');x.className='bd';x.style.color='#f2c14e';x.textContent='Curiosidade: '+l.x;box.appendChild(x)}
+if(l.go){const gb=document.createElement('button');gb.textContent='Ver no mapa geográfico';gb.onclick=()=>goMap(l.go);box.appendChild(gb)}
+if(disc.size===total&&was<total){const f=document.createElement('div');f.className='bd';f.style.color='#5ee0b0';f.style.fontWeight='700';f.textContent='Parabéns! Você descobriu todas as passagens do mapa.';box.appendChild(f);spark()}
+const sc=$('mmscroll'),k=$('mm').clientWidth/620;
+sc.scrollTo({left:Math.max(0,l.p[0]*k-sc.clientWidth/2),behavior:'smooth'});
+}
+$('mmAll').onclick=()=>MM.forEach((b,i)=>setB(i,true));
+$('mmNone').onclick=()=>MM.forEach((b,i)=>setB(i,false));
+$('mmRand').onclick=()=>{
+let pool=[];MM.forEach((b,bi)=>b.L.forEach((l,li)=>{if(!disc.has(l.id))pool.push([bi,li])}));
+if(!pool.length)MM.forEach((b,bi)=>b.L.forEach((l,li)=>pool.push([bi,li])));
+const p=pool[Math.floor(Math.random()*pool.length)];openLeaf(p[0],p[1]);
+};
+counter();
+function showTab(t){
+$('v-map').hidden=t!=='map';$('v-mental').hidden=t!=='mental';
+$('tabMap').className=t==='map'?'on':'';$('tabMental').className=t==='mental'?'on':'';
+try{history.replaceState(null,'','#'+(t==='map'?'mapa':'mental'))}catch(e){}
+if(t==='mental'){const sc=$('mmscroll');sc.scrollLeft=(sc.scrollWidth-sc.clientWidth)/2}
+}
+function goMap(g){
+showTab('map');window.scrollTo(0,0);
+if(g.j!==undefined)sel(g.j);else{stop(true);show(g.c,'')}
+}
+
+sel(2);
+if(location.hash==="#mental")showTab("mental");
+</script>
+</body>
+</html>
